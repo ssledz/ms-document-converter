@@ -5,26 +5,26 @@ import java.io.InputStream;
 
 public abstract class AbstractDocument {
 
-    private final String fileName;
-    private final byte[] content;
+	private final String fileName;
+	private final byte[] content;
 
-    public AbstractDocument(String fileName, byte[] content) {
-	this.fileName = fileName;
-	this.content = content;
-    }
+	public AbstractDocument(final String fileName, final byte[] content) {
+		this.fileName = fileName;
+		this.content = content;
+	}
 
-    public String getFileName() {
-	return fileName;
-    }
+	public String getFileName() {
+		return fileName;
+	}
 
-    public byte[] getContent() {
-	return content;
-    }
-    
-    public InputStream getContentInputStream() {
-	return new ByteArrayInputStream(content);
-    }
+	public byte[] getContent() {
+		return content;
+	}
 
-    public abstract void accept(DocumentVisitor visitor);
+	public InputStream getContentInputStream() {
+		return new ByteArrayInputStream(content);
+	}
+
+	public abstract void accept(DocumentVisitor visitor);
 
 }

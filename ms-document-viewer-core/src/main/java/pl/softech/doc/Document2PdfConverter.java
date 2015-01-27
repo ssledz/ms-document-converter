@@ -4,61 +4,66 @@ import java.io.ByteArrayOutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.docx4j.convert.out.pdf.PdfConversion;
-import org.docx4j.convert.out.pdf.viaXSLFO.PdfSettings;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.Docx4J;
+import org.docx4j.convert.out.FOSettings;
+import org.docx4j.fonts.IdentityPlusMapper;
+import org.docx4j.fonts.Mapper;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.springframework.stereotype.Service;
 
 @Service
 public class Document2PdfConverter {
 
-    private Pattern pattern = Pattern.compile("(.+)\\.[^\\.].+$");
+	private final Mapper fontMapper = new IdentityPlusMapper();
 
-    public AbstractDocument convert(AbstractDocument document) {
-	DocumentVisitor visitor = new DocumentVisitor();
-	document.accept(visitor);
-	return visitor.getPdfDocument();
-    }
+	private final Pattern pattern = Pattern.compile("(.+)\\.[^\\.].+$");
 
-    private class DocumentVisitor extends DocumentVisitorAdapter {
-
-	private PdfDocument pdfDocument;
-
-	public PdfDocument getPdfDocument() {
-	    return pdfDocument;
+	public AbstractDocument convert(final AbstractDocument document) {
+		final DocumentVisitor visitor = new DocumentVisitor();
+		document.accept(visitor);
+		return visitor.getPdfDocument();
 	}
 
-	@Override
-	public void visit(WordDocument document) {
+	private class DocumentVisitor extends DocumentVisitorAdapter {
 
-	    try {
-		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(document.getContentInputStream());
-		
-		PdfSettings pdfSettings = new PdfSettings();
+		private PdfDocument pdfDocument;
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		public PdfDocument getPdfDocument() {
+			return pdfDocument;
+		}
 
-		PdfConversion converter = new org.docx4j.convert.out.pdf.viaXSLFO.Conversion(wordMLPackage);
+		@Override
+		public void visit(final WordDocument document) {
 
-		converter.output(out, pdfSettings);
+			try {
+				final WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(document.getContentInputStream());
 
-		String fileName = String.format("%s.pdf", getFileNameWithoutExtension(document.getFileName()));
+				wordMLPackage.setFontMapper(fontMapper);
 
-		pdfDocument = new PdfDocument(fileName, out.toByteArray());
+				final FOSettings foSettings = Docx4J.createFOSettings();
 
-	    } catch (Docx4JException e) {
-		throw new RuntimeException(e);
-	    }
+				foSettings.setWmlPackage(wordMLPackage);
+
+				final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+				Docx4J.toFO(foSettings, out, Docx4J.FLAG_EXPORT_PREFER_XSL);
+
+				final String fileName = String.format("%s.pdf", getFileNameWithoutExtension(document.getFileName()));
+
+				pdfDocument = new PdfDocument(fileName, out.toByteArray());
+
+			} catch (final Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
-    }
 
-    private String getFileNameWithoutExtension(String fileName) {
-	Matcher m = pattern.matcher(fileName);
-	if (m.find()) {
-	    return m.group(1);
+	private String getFileNameWithoutExtension(final String fileName) {
+		final Matcher m = pattern.matcher(fileName);
+		if (m.find()) {
+			return m.group(1);
+		}
+		return fileName;
 	}
-	return fileName;
-    }
 
 }

@@ -15,48 +15,46 @@ import com.google.common.collect.ImmutableMap;
 @Component
 public class Bytes2DocumentTransformer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bytes2DocumentTransformer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Bytes2DocumentTransformer.class);
 
-    private MediaTypeRegistry mediaTypeRegistry = MediaTypeRegistry.getDefaultRegistry();
+	private MediaTypeRegistry mediaTypeRegistry = MediaTypeRegistry.getDefaultRegistry();
 
-    private Map<MediaType, DocumentFactory> mediaType2docFactory = new ImmutableMap.Builder<MediaType, DocumentFactory>()
-	    .put(MediaType.application("vnd.openxmlformats-officedocument.wordprocessingml.document"),
-		    wordDocumentFactory()).build();
+	private Map<MediaType, DocumentFactory> mediaType2docFactory = new ImmutableMap.Builder<MediaType, DocumentFactory>().put(
+			MediaType.application("vnd.openxmlformats-officedocument.wordprocessingml.document"), wordDocumentFactory()).build();
 
-    public AbstractDocument transform(byte[] content, @Header("fileName") String fileName) {
+	public AbstractDocument transform(final byte[] content, @Header("fileName") final String fileName) {
 
-	Tika tika = new Tika();
-	
-	MediaType type = MediaType.parse(tika.detect(content, fileName));
-	MediaType superType = mediaTypeRegistry.getSupertype(type);
+		final Tika tika = new Tika();
 
-	LOGGER.debug("Transforming {0}[size={1}B] of type {2} to Document", fileName, content.length, type.getType());
-	
-	if (!MediaType.application("x-tika-ooxml").equals(superType)) {
-	    throw new UnsupportedMediaTypeException(String.format("Only Open XML Document is supported. Got %s",
-		    type.getType()));
+		final MediaType type = MediaType.parse(tika.detect(content, fileName));
+		final MediaType superType = mediaTypeRegistry.getSupertype(type);
+
+		LOGGER.debug("Transforming {0}[size={1}B] of type {2} to Document", fileName, content.length, type.getType());
+
+		if (!MediaType.application("x-tika-ooxml").equals(superType)) {
+			throw new UnsupportedMediaTypeException(String.format("Only Open XML Document is supported. Got %s", type.getType()));
+		}
+
+		final DocumentFactory factory = mediaType2docFactory.get(type);
+
+		if (factory == null) {
+			throw new UnsupportedDocumentException(String.format("Document of type %s is unsupported", type.getType()));
+		}
+
+		return factory.create(content, fileName);
 	}
 
-	DocumentFactory factory = mediaType2docFactory.get(type);
-
-	if (factory == null) {
-	    throw new UnsupportedDocumentException(String.format("Document of type %s is unsupported", type.getType()));
+	private DocumentFactory wordDocumentFactory() {
+		return new DocumentFactory() {
+			@Override
+			public AbstractDocument create(final byte[] content, final String fileName) {
+				return new WordDocument(fileName, content);
+			}
+		};
 	}
 
-	return factory.create(content, fileName);
-    }
-
-    private DocumentFactory wordDocumentFactory() {
-	return new DocumentFactory() {
-	    @Override
-	    public AbstractDocument create(byte[] content, String fileName) {
-		return new WordDocument(fileName, content);
-	    }
-	};
-    }
-
-    private interface DocumentFactory {
-	AbstractDocument create(byte[] content, String fileName);
-    }
+	private interface DocumentFactory {
+		AbstractDocument create(byte[] content, String fileName);
+	}
 
 }
