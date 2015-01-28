@@ -49,7 +49,7 @@ public class Document2PdfService {
 
 	@Override
 	public void visit(ExcelDocument document) {
-	    Docx4jExcelDocumentConverter converter = new Docx4jExcelDocumentConverter();
+	    ExcelDocumentConverter converter = new ExcelDocumentConverter();
 	    pdfDocument = createPdf(converter, document);
 	}
 

@@ -21,6 +21,8 @@ import com.lowagie.text.pdf.PdfWriter;
 
 public class PowerPointDocumentConverter implements DocumentConverter {
 
+    private static final float FACTOR = 1.5f;
+
     private Graphics2D createGraphics(BufferedImage imgBuffer) {
 	Graphics2D g2 = imgBuffer.createGraphics();
 	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -40,11 +42,11 @@ public class PowerPointDocumentConverter implements DocumentConverter {
 
 	int margin = 36;
 
-	float aWidth = (float) (pageSize.getWidth() - 2 * margin);
-	float aHeight = (float) (pageSize.getHeight() - 2 * margin);
-	
-	int width = Units.toEMU(aWidth) / Units.EMU_PER_PIXEL;
-	int height = Units.toEMU(aHeight) / Units.EMU_PER_PIXEL;
+	float bWidth = (float) (pageSize.getWidth() - 2 * margin);
+	float bHeight = (float) (pageSize.getHeight() - 2 * margin);
+
+	int widthPx = (int) (Units.toEMU(bWidth) / Units.EMU_PER_PIXEL * FACTOR);
+	int heightPx = (int) (Units.toEMU(bHeight) / Units.EMU_PER_PIXEL * FACTOR);
 
 	Document pdf = new Document(new RectangleReadOnly((float) pageSize.getWidth(), (float) pageSize.getHeight()),
 		margin, margin, margin, margin);
@@ -55,7 +57,7 @@ public class PowerPointDocumentConverter implements DocumentConverter {
 
 	for (XSLFSlide slide : ppt.getSlides()) {
 
-	    BufferedImage imgBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	    BufferedImage imgBuffer = new BufferedImage(widthPx, heightPx, BufferedImage.TYPE_INT_ARGB);
 
 	    Graphics2D g2 = createGraphics(imgBuffer);
 	    slide.draw(g2);
@@ -64,10 +66,9 @@ public class PowerPointDocumentConverter implements DocumentConverter {
 	    ImageIO.write(imgBuffer, "png", otmp);
 	    Image img = Image.getInstance(otmp.toByteArray());
 	    img.setBorder(RectangleReadOnly.NO_BORDER);
-	    img.scaleToFit(aWidth, aHeight);
-	    img.setAlignment(Image.MIDDLE);
+	    img.scalePercent((float) (bWidth / pageSize.getWidth() * 100),
+		    (float) (bHeight / pageSize.getHeight() * 100));
 	    pdf.add(img);
-
 	}
 
 	pdf.close();
