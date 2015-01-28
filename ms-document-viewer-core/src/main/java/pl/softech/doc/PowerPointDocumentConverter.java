@@ -1,5 +1,6 @@
 package pl.softech.doc;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -31,6 +32,7 @@ public class PowerPointDocumentConverter implements DocumentConverter {
 	g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 	g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 	g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+	g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 	return g2;
     }
 
@@ -60,6 +62,10 @@ public class PowerPointDocumentConverter implements DocumentConverter {
 	    BufferedImage imgBuffer = new BufferedImage(widthPx, heightPx, BufferedImage.TYPE_INT_ARGB);
 
 	    Graphics2D g2 = createGraphics(imgBuffer);
+	    
+	    g2.setBackground(Color.WHITE);
+	    g2.clearRect(0, 0, widthPx, heightPx);
+	    
 	    slide.draw(g2);
 	    pdf.add(new Paragraph());
 	    ByteArrayOutputStream otmp = new ByteArrayOutputStream();
