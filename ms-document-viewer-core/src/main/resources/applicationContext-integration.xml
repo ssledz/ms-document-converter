@@ -28,7 +28,7 @@
 
     <int:transformer input-channel="bytesIn" output-channel="documentsIn" ref="bytes2DocumentTransformer"/>
 
-    <int:service-activator input-channel="documentsIn" ref="document2PdfConverter" output-channel="documentsOut"/>
+    <int:service-activator input-channel="documentsIn" ref="document2PdfService" output-channel="documentsOut"/>
 
     <int:chain input-channel="documentsOut" output-channel="filesOut">
         <int:header-enricher>
