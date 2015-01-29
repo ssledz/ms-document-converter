@@ -14,11 +14,12 @@ import org.apache.poi.util.Units;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.Image;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.RectangleReadOnly;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.RectangleReadOnly;
+import com.itextpdf.text.pdf.PdfWriter;
+
 
 public class PowerPointDocumentConverter implements DocumentConverter {
 
