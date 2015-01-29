@@ -39,7 +39,7 @@ public class PowerPointDocumentConverter implements DocumentConverter {
     @Override
     public void convertToPdf(AbstractDocument document, OutputStream out) throws Exception {
 
-	XMLSlideShow ppt = new XMLSlideShow(document.getContentInputStream());
+	XMLSlideShow ppt = new XMLSlideShow(document.getInputStream());
 	Dimension pageSize = ppt.getPageSize();
 
 	int margin = 36;

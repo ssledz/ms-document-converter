@@ -25,7 +25,7 @@ public abstract class AbstractDocument {
 	return content;
     }
 
-    public InputStream getContentInputStream() {
+    public InputStream getInputStream() {
 	return new ByteArrayInputStream(content);
     }
     

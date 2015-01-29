@@ -70,7 +70,7 @@ public class Docx4jWordDocumentConverter implements DocumentConverter {
 
     @Override
     public void convertToPdf(AbstractDocument document, OutputStream out) throws Exception {
-	final WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(document.getContentInputStream());
+	final WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(document.getInputStream());
 
 	wordMLPackage.setFontMapper(fontMapper);
 
