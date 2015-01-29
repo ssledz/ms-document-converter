@@ -22,9 +22,10 @@ public class Bytes2DocumentTransformer {
     private Map<MediaType, DocumentFactory> mediaType2docFactory = new ImmutableMap.Builder<MediaType, DocumentFactory>()//
 	    .put(MediaType.application("vnd.openxmlformats-officedocument.wordprocessingml.document"),
 		    wordDocumentFactory())//
-	    .put(MediaType.application("vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-		    excelDocumentFactory())//
-		    .put(MediaType.application("vnd.openxmlformats-officedocument.presentationml.presentation"), presentationDocumentFactory())//
+	    .put(MediaType.application("vnd.openxmlformats-officedocument.spreadsheetml.sheet"), excelDocumentFactory())//
+	    .put(MediaType.application("vnd.openxmlformats-officedocument.presentationml.presentation"),
+		    presentationDocumentFactory())//
+	    .put(MediaType.application("pdf"), pdfDocumentFactory())//
 	    .build();
 
     public AbstractDocument transform(final byte[] content, @Header("fileName") final String fileName) {
@@ -36,7 +37,7 @@ public class Bytes2DocumentTransformer {
 
 	LOGGER.debug("Transforming {0}[size={1}B] of type {2} to Document", fileName, content.length, type.getType());
 
-	if (!MediaType.application("x-tika-ooxml").equals(superType)) {
+	if (!MediaType.application("pdf").equals(type) && !MediaType.application("x-tika-ooxml").equals(superType)) {
 	    throw new UnsupportedMediaTypeException(String.format("Only Open XML Document is supported. Got %s",
 		    type.getType()));
 	}
@@ -58,7 +59,16 @@ public class Bytes2DocumentTransformer {
 	    }
 	};
     }
-    
+
+    private DocumentFactory pdfDocumentFactory() {
+	return new DocumentFactory() {
+	    @Override
+	    public AbstractDocument create(final byte[] content, final String fileName) {
+		return new PdfDocument(fileName, content);
+	    }
+	};
+    }
+
     private DocumentFactory presentationDocumentFactory() {
 	return new DocumentFactory() {
 	    @Override
