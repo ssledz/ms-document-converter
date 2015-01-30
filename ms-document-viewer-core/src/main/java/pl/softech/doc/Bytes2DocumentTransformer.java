@@ -35,7 +35,7 @@ public class Bytes2DocumentTransformer {
 	final MediaType type = MediaType.parse(tika.detect(content, fileName));
 	final MediaType superType = mediaTypeRegistry.getSupertype(type);
 
-	LOGGER.debug("Transforming {0}[size={1}B] of type {2} to Document", fileName, content.length, type.getType());
+	LOGGER.debug("Transforming {}[size={}B] of type {} to Document", fileName, content.length, type.getType());
 
 	if (!MediaType.application("pdf").equals(type) && !MediaType.application("x-tika-ooxml").equals(superType)) {
 	    throw new UnsupportedMediaTypeException(String.format("Only Open XML Document is supported. Got %s",

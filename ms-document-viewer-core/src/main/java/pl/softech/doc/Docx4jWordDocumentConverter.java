@@ -63,8 +63,8 @@ public class Docx4jWordDocumentConverter implements DocumentConverter {
 	}
 
 	docPropsCustomPart.setProperty("\"DocID\"", "123");
-	docPropsCustomPart.setProperty("\"Effective Date\"", "123");
-	docPropsCustomPart.setProperty("DocumentType", "123");
+	docPropsCustomPart.setProperty("\"Effective Date\"", "xxx");
+	docPropsCustomPart.setProperty("DocumentType", "xxx");
 
     }
 
